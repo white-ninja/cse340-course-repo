@@ -13,7 +13,10 @@ import { Pool } from 'pg';
  */
 const pool = new Pool({
     connectionString: process.env.DB_URL,
-    ssl: true
+    // Render's PostgreSQL certificate is self-signed; keep certificate verification elsewhere.
+    ssl: process.env.NODE_ENV?.toLowerCase() === 'production'
+        ? { rejectUnauthorized: false }
+        : true
 });
 
 /**
