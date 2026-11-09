@@ -1,12 +1,32 @@
 <%- include('partials/header') %>
-<main>
-    <h1><%= title %></h1>
-    <!-- Put your page-specific content here -->
-        <h2>Upcoming Service Projects</h2>
-                <ul>
-                    <li>Park Cleanup - Join us to clean up local parks and make them beautiful!</li>
-                    <li>Food Drive - Help collect and distribute food to those in need.</li>
-                    <li>Community Tutoring - Volunteer to tutor students in various subjects.</li>
-                </ul>
+
+<main class="page">
+    <h2><%= title %></h2>
+    <p>Explore upcoming service opportunities with our partner organizations:</p>
+
+    <% if (projects && projects.length > 0) { %>
+        <ul>
+            <% projects.forEach(project => { %>
+                <% 
+                    // Format the date nicely (e.g., April 15, 2026)
+                    const formattedDate = new Date(project.date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                %>
+                <li>
+                    <strong><%= formattedDate %></strong>: 
+                    <%= project.title %> 
+                    (<em><%= project.organization_name %></em>)
+                    <p><%= project.description %></p>
+                    <small>Location: <%= project.location %></small>
+                </li>
+            <% }); %>
+        </ul>
+    <% } else { %>
+        <p>No service projects available at this time.</p>
+    <% } %>
 </main>
+
 <%- include('partials/footer') %>
