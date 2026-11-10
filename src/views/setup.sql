@@ -60,3 +60,54 @@ VALUES
 (3, 'School Supply Packing', 'Fill backpacks with notebooks, pens, and learning tools for students in need.', 'UnityServe Warehouse', '2026-07-15'),
 (3, 'Winter Coat Drive', 'Collect, wash, and organize winter jackets and blankets for the upcoming season.', 'Community Center', '2026-08-10'),
 (3, 'Blood Drive Coordination', 'Greet donors, manage registration tables, and serve refreshments.', 'City Health Center', '2026-08-28');
+
+-- ========================================
+-- Category Table & Many-to-Many Join Table
+-- ========================================
+
+-- 1. Create the category table
+CREATE TABLE category (
+    category_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
+);
+
+-- 2. Create the junction table for the many-to-many relationship
+CREATE TABLE project_category (
+    project_id INT NOT NULL,
+    category_id INT NOT NULL,
+    PRIMARY KEY (project_id, category_id),
+    CONSTRAINT fk_project
+        FOREIGN KEY (project_id)
+        REFERENCES project (project_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_category
+        FOREIGN KEY (category_id)
+        REFERENCES category (category_id)
+        ON DELETE CASCADE
+);
+
+-- 3. Insert at least 3 relevant categories
+INSERT INTO category (name)
+VALUES 
+('Environment'),
+('Education'),
+('Community Support');
+
+-- 4. Associate each project with at least one category 
+INSERT INTO project_category (project_id, category_id)
+VALUES
+(1, 1),  -- Park Cleanup -> Environment
+(2, 3),  -- Youth Center Repair -> Community Support
+(3, 2),  -- Library Book Sorting -> Education
+(4, 1),  -- Trail Maintenance -> Environment
+(5, 3),  -- Senior Center Wheelchair Ramp -> Community Support
+(6, 1),  -- Urban Garden Planting -> Environment
+(7, 2),  -- Farmers Market Workshop -> Education
+(8, 1),  -- Greenhouse Winterization -> Environment
+(9, 2),  -- Seed Packet Assembly -> Education
+(10, 1), -- Compost Pile Turning -> Environment
+(11, 3), -- Food Drive Sorting -> Community Support
+(12, 3), -- Holiday Meal Prep -> Community Support
+(13, 2), -- School Supply Packing -> Education
+(14, 3), -- Winter Coat Drive -> Community Support
+(15, 3); -- Blood Drive Coordination -> Community Support

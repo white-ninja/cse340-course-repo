@@ -4,6 +4,7 @@ import express from 'express';
 import { testConnection } from './src/models/db.js';
 import { getAllOrganizations } from './src/models/organizations.js';
 import { getAllProjects } from './src/models/projects.js';
+import { getAllCategories } from './src/models/categories.js';
 
 // Define the application environment
 const NODE_ENV = process.env.NODE_ENV?.toLowerCase() || 'production';
@@ -59,8 +60,14 @@ app.get('/projects', async (req, res) => {
 });
 
 app.get('/categories', async (req, res) => {
-    const title = 'Project Categories';
-    res.render('categories', { title });
+    try {
+        const categories = await getAllCategories();
+        const title = 'Service Project Categories';
+        res.render('categories', { title, categories });
+    } catch (error) {
+        console.error('Failed to load categories page:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 // Start the server and listen on the specified port
