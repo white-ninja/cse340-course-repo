@@ -1,6 +1,6 @@
 import db from './db.js'; // Database import command
 
-export async function getAllCategories() {
+export const getAllCategories = async () => {
     try {
         const query = `
             SELECT category_id, name 
@@ -13,4 +13,4 @@ export async function getAllCategories() {
         console.error('Error fetching categories:', error);
         throw error;
     }
-}
+};

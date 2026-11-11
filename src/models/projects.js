@@ -1,6 +1,6 @@
 import db from './db.js';
 
-export async function getAllProjects() {
+export const getAllProjects = async () => {
     try {
         const query = `
             SELECT p.project_id, p.title, p.description, p.location, p.date, o.name AS organization_name
@@ -14,4 +14,4 @@ export async function getAllProjects() {
         console.error('Error fetching projects:', error);
         throw error;
     }
-}
+};
