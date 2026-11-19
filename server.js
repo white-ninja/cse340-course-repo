@@ -66,7 +66,11 @@ app.use((err, req, res, next) => {
     const status = err.status || 500;
     const template = status === 404 ? '404' : '500';
     const context = {
-        title: status === 404 ? 'Page Not Found' : 'Server Error',
+        title: status === 404
+            ? 'Page Not Found'
+            : status === 400
+                ? 'Bad Request'
+                : 'Server Error',
         error: err.message,
         stack: err.stack
     };

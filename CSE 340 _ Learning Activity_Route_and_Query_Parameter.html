@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<!-- saved from url=(0083)https://byui-cse.github.io/cse340-ww-course-v2/week03/prepare-route-parameters.html -->
+<html lang="en-us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CSE 340 | Learning Activity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&amp;family=Open+Sans&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./CSE 340 _ Learning Activity_Route_and_Query_Parameter_files/course.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-dark-reasonable.min.css">
+
+</head>
+
+<body>
+  <header>
+    <div class="page">
+      <h1>CSE 340<span id="coursetitle">: Web Backend Development</span></h1>
+      <img src="./CSE 340 _ Learning Activity_Route_and_Query_Parameter_files/byui-logo.svg" alt="BYU-I logo" class="logo">
+    </div>
+  </header>
+  <main class="page">
+    <nav id="autogen-top-nav">
+      <!-- This nav is auto-generated -->
+      <span><a href="https://byui-cse.github.io/cse340-ww-course-v2/index.html">Home</a></span>
+      <span><a href="https://byui-cse.github.io/cse340-ww-course-v2/week01/index.html">W1</a></span>
+      <span><a href="https://byui-cse.github.io/cse340-ww-course-v2/week02/index.html">W2</a></span>
+      <span class="active"><a href="https://byui-cse.github.io/cse340-ww-course-v2/week03/index.html">W3</a></span>
+      <span><a href="https://byui-cse.github.io/cse340-ww-course-v2/week04/index.html">W4</a></span>
+      <span><a href="https://byui-cse.github.io/cse340-ww-course-v2/week05/index.html">W5</a></span>
+      <span><a href="https://byui-cse.github.io/cse340-ww-course-v2/week06/index.html">W6</a></span>
+      <span><a href="https://byui-cse.github.io/cse340-ww-course-v2/week07/index.html">W7</a></span>
+      <!-- end auto-generated -->
+    </nav>
+    <h2>W03 Learning Activity: Route and Query Parameters</h2>
+
+    <h3>Overview</h3>
+    <p>In this activity, you will learn about route parameters and query parameters. Then, you will add new functionality to your application to load specific organizations by their unique identifiers using these parameters.</p>
+
+    <h3>Preparation Material</h3>
+    <p>When building web applications with Express, handling dynamic user inputs is essential. Two common methods for capturing data from URLs are <strong>query parameters</strong> and <strong>route parameters</strong>. While they serve different purposes, understanding both is crucial for creating flexible and user-friendly applications. These concepts build directly on the routing fundamentals you have learned, extending your ability to create dynamic, data-driven routes.</p>
+
+    <h4>Query Parameters: The Classic Approach</h4>
+    <p>
+        Query parameters (also called GET parameters) are key-value pairs appended to a URL after a question mark (<code>?</code>). You have encountered this pattern countless times when using search engines, filtering products, or configuring page views. They represent optional information that modifies how a page behaves without changing which page you are accessing.
+    </p>
+    <p>
+        For example, in the URL <code>https://store.com/products?view=grid&amp;sort=price</code>, <code>view</code> and <code>sort</code> are query parameters with values <code>grid</code> and <code>price</code> respectively. The base page is still <code>/products</code>, but the parameters tell the server how to present that page.
+    </p>
+    <h5>Defining and Accessing Query Parameters</h5>
+    <p>
+        In Express, query parameters do not need to be defined in advance. They are automatically parsed from the URL and made available in the <code>req.query</code> object, which makes them incredibly flexible for user-driven customization:
+    </p>
+<pre><code class="javascript hljs language-javascript" data-highlighted="yes">app.<span class="hljs-title function_">get</span>(<span class="hljs-string">'/products'</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> viewType = req.<span class="hljs-property">query</span>.<span class="hljs-property">view</span>;    <span class="hljs-comment">// 'grid', 'details', etc.</span>
+    <span class="hljs-keyword">const</span> sortBy = req.<span class="hljs-property">query</span>.<span class="hljs-property">sort</span>;      <span class="hljs-comment">// 'price', 'name', etc.</span>
+    
+    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">`Showing products in <span class="hljs-subst">${viewType}</span> view, sorted by <span class="hljs-subst">${sortBy}</span>`</span>);
+});
+</code></pre>
+    <p>
+        Multiple parameters are separated with ampersands (<code>&amp;</code>), and Express automatically parses them into a JavaScript object. This means you can access any query parameter as a property on <code>req.query</code>, even if you did not anticipate it when writing your route.
+    </p>
+    <h5>When to Use Query Parameters</h5>
+    <p>Query parameters excel in scenarios where you need flexibility and optional configuration:</p>
+    <ul>
+        <li>
+            <strong>Optional configuration</strong>: When parameters might be absent entirely (for example, <code>?sort=price</code> or no parameters at all)
+        </li>
+        <li>
+            <strong>Filtering and sorting</strong>: When users can select from multiple criteria (<code>?category=shoes&amp;color=red&amp;size=9</code>)
+        </li>
+        <li>
+            <strong>Pagination</strong>: For page numbers and size limits (<code>?page=2&amp;limit=20</code>)
+        </li>
+        <li>
+            <strong>Search queries</strong>: For user-entered search terms (<code>?search=blue+shoes</code>)
+        </li>
+        <li>
+            <strong>Preserving UI state</strong>: For saving view preferences that persist across page loads (<code>?view=grid&amp;expanded=true</code>)
+        </li>
+    </ul>
+    <div class="callout info">
+        <h4>Query Parameters and User Experience</h4>
+        <p>
+            Query parameters create shareable URLs that preserve user preferences. When someone bookmarks <code>/products?category=electronics&amp;sort=price</code>, they return to exactly the same filtered, sorted view. This makes query parameters perfect for search results, filtered lists, and any situation where users might want to share or bookmark a specific configuration.
+        </p>
+    </div>
+    <h4>Route Parameters: Dynamic Path Components</h4>
+    <p>Route parameters take a fundamentally different approach by capturing values directly from the URL path structure itself. This creates cleaner, more semantic URLs that feel like natural extensions of your site's hierarchy. Instead of asking "How should I show this page?", route parameters answer the question "Which specific thing are we looking at?"</p>
+    <h5>Defining Route Parameters</h5>
+    <p>
+        In Express, route parameters are defined right in the route path by using a colon (<code>:</code>) followed by a parameter name. These parameters act as placeholders for dynamic values that will be extracted from the actual URL when a request comes in:
+    </p>
+<pre><code class="javascript hljs language-javascript" data-highlighted="yes">app.<span class="hljs-title function_">get</span>(<span class="hljs-string">'/user/:id'</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    <span class="hljs-comment">// Route handler logic here</span>
+});
+</code></pre>
+    <p>
+        In this example, the route <code>/user/:id</code> includes a parameter named <code>id</code>. This route will match URLs like <code>/user/123</code>, <code>/user/sarah</code>, or <code>/user/admin</code>, capturing whatever comes after <code>/user/</code> as the <code>id</code> parameter.
+    </p>
+    <h5>Accessing Route Parameters</h5>
+    <p>
+        Once a route parameter is defined, its value can be accessed in the route handler through the <code>req.params</code> object. This object contains key-value pairs where the keys are the parameter names from your route definition, and the values are the actual segments from the requested URL:
+    </p>
+<pre><code class="javascript hljs language-javascript" data-highlighted="yes">app.<span class="hljs-title function_">get</span>(<span class="hljs-string">'/user/:id'</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> userId = req.<span class="hljs-property">params</span>.<span class="hljs-property">id</span>; <span class="hljs-comment">// Extract the 'id' parameter</span>
+    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">`You requested information for user ID: <span class="hljs-subst">${userId}</span>`</span>);
+});
+</code></pre>
+    <p>
+        You can define multiple parameters in a single route, separated by slashes. For example, <code>/blog/:year/:month/:slug</code> would capture three different values, allowing URLs like <code>/blog/2024/march/express-tutorial</code>. These would be accessible as <code>req.params.year</code>, <code>req.params.month</code>, and <code>req.params.slug</code> respectively.
+    </p>
+    <h5>When to Use Route Parameters</h5>
+    <p>Route parameters are ideal for representing the core identity of what you are displaying:</p>
+    <ul>
+        <li>
+            <strong>Representing resources</strong>: For entities with unique identifiers (<code>/products/123</code>, <code>/orders/ORDER-456</code>)
+        </li>
+        <li>
+            <strong>Hierarchical data</strong>: For parent-child relationships (<code>/categories/electronics/laptops</code>)
+        </li>
+        <li>
+            <strong>Clean, semantic URLs</strong>: For human-readable and SEO-friendly paths (<code>/blog/2023/express-tutorial</code>)
+        </li>
+        <li><strong>Required values</strong>: When the parameter must be present for the route to make sense</li>
+    </ul>
+
+    <h4>Query vs. Route Parameters: Understanding the Difference</h4>
+    <p>While both methods pass data through URLs, they serve fundamentally different purposes and have distinct characteristics that make each appropriate for different scenarios:</p>
+    <h5>Structural Differences</h5>
+    <ul>
+        <li>
+            <strong>URL Structure</strong>: Route parameters are embedded within the path structure (<code>/user/123</code>), while query parameters come after a <code>?</code> at the end of the URL (<code>/user?id=123</code>)
+        </li>
+        <li><strong>Definition Requirements</strong>: Route parameters must be predefined in your route patterns, while query parameters can be added freely without changing your routes</li>
+        <li><strong>Presence Requirements</strong>: Route parameters are typically required (the route will not match without them), while query parameters are optional by default</li>
+    </ul>
+    <h3>Conceptual Differences</h3>
+    <ul>
+        <li><strong>Purpose</strong>: Route parameters identify <em>what</em> you are looking at, while query parameters modify <em>how</em> you see it.</li>
+        <li><strong>Semantics</strong>: Route parameters change the meaning of the page, while query parameters change the presentation of the page.</li>
+        <li><strong>URL Hierarchy</strong>: Route parameters create logical hierarchies in your URL structure, while query parameters add optional metadata.</li>
+    </ul>
+    <div class="callout info">
+        <h4>Mental Model: Books and Reading Preferences</h4>
+        <p>
+            Think of route parameters like choosing a specific book from a library: <code>/library/books/the-great-gatsby</code> identifies exactly which book you want. Query parameters are like your reading preferences: <code>/library/books/the-great-gatsby?font=large&amp;theme=dark</code> – you are still reading the same book, but you are customizing how you want to read it.
+        </p>
+    </div>
+    <h4>Using Both Together</h4>
+    <p>The real power comes from combining both approaches strategically. This allows you to create URLs that are both semantically meaningful and functionally flexible:</p>
+<pre><code class="javascript hljs language-javascript" data-highlighted="yes"><span class="hljs-comment">// URL: /products/shoes?color=blue&amp;size=9&amp;sort=price</span>
+
+app.<span class="hljs-title function_">get</span>(<span class="hljs-string">'/products/:category'</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> category = req.<span class="hljs-property">params</span>.<span class="hljs-property">category</span>;  <span class="hljs-comment">// 'shoes'</span>
+    <span class="hljs-keyword">const</span> color = req.<span class="hljs-property">query</span>.<span class="hljs-property">color</span>;         <span class="hljs-comment">// 'blue'</span>
+    <span class="hljs-keyword">const</span> size = req.<span class="hljs-property">query</span>.<span class="hljs-property">size</span>;           <span class="hljs-comment">// '9'</span>
+    <span class="hljs-keyword">const</span> sort = req.<span class="hljs-property">query</span>.<span class="hljs-property">sort</span>;           <span class="hljs-comment">// 'price'</span>
+    
+    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">`Showing <span class="hljs-subst">${color}</span> <span class="hljs-subst">${category}</span> in size <span class="hljs-subst">${size}</span>, sorted by <span class="hljs-subst">${sort}</span>`</span>);
+});
+</code></pre>
+    <p>
+        This approach creates intuitive URLs where the main resource is identified by route parameters (what category of products), while filtering, sorting, and display options are controlled by query parameters (how to show those products). Users understand that <code>/products/shoes</code> and <code>/products/electronics</code> are fundamentally different pages, while <code>?color=blue</code> and <code>?color=red</code> are different views of the same page.
+    </p>
+    
+    <h4>Parameter Validation and Safety</h4>
+    <p>Since parameters come from user input, validation is crucial for both security and user experience. Different parameter types require different validation approaches.</p>
+    <h5>Query Parameter Validation</h5>
+    <p>Query parameters are optional by nature, so your validation should handle missing values gracefully while rejecting invalid ones:</p>
+<pre><code class="javascript hljs language-javascript" data-highlighted="yes">app.<span class="hljs-title function_">get</span>(<span class="hljs-string">'/products'</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> viewType = req.<span class="hljs-property">query</span>.<span class="hljs-property">view</span>;
+    
+    <span class="hljs-comment">// Define valid options</span>
+    <span class="hljs-keyword">const</span> validViews = [<span class="hljs-string">'grid'</span>, <span class="hljs-string">'details'</span>, <span class="hljs-string">'list'</span>];
+    
+    <span class="hljs-comment">// Validate if provided</span>
+    <span class="hljs-keyword">if</span> (viewType &amp;&amp; !validViews.<span class="hljs-title function_">includes</span>(viewType)) {
+        <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">400</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">'Invalid view type. Must be grid, details, or list.'</span>);
+    }
+    
+    <span class="hljs-comment">// Use validated value or sensible default</span>
+    <span class="hljs-keyword">const</span> finalView = viewType || <span class="hljs-string">'grid'</span>;
+    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">`Showing products in <span class="hljs-subst">${finalView}</span> view`</span>);
+});
+</code></pre>
+    <h5>Route Parameter Validation</h5>
+    <p>Route parameters always exist when a route matches, but they may not contain the expected data format or type:</p>
+<pre><code class="javascript hljs language-javascript" data-highlighted="yes">app.<span class="hljs-title function_">get</span>(<span class="hljs-string">'/user/:id'</span>, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> userId = req.<span class="hljs-property">params</span>.<span class="hljs-property">id</span>;
+
+    <span class="hljs-comment">// Validate that the ID is numeric</span>
+    <span class="hljs-keyword">if</span> (!<span class="hljs-regexp">/^\d+$/</span>.<span class="hljs-title function_">test</span>(userId)) {
+        <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">400</span>).<span class="hljs-title function_">send</span>(<span class="hljs-string">'Invalid user ID. Must be a number.'</span>);
+    }
+
+    <span class="hljs-comment">// Convert string to number for use in application logic</span>
+    <span class="hljs-keyword">const</span> numericUserId = <span class="hljs-built_in">parseInt</span>(userId, <span class="hljs-number">10</span>);
+
+    res.<span class="hljs-title function_">send</span>(<span class="hljs-string">`You requested information for user ID: <span class="hljs-subst">${numericUserId}</span>`</span>);
+});
+</code></pre>
+    <div class="callout warning">
+        <h4>Security Consideration</h4>
+        <p>Always validate and sanitize parameter values before using them in database queries, file operations, or any other potentially dangerous operations. Parameters are user input and should never be trusted without validation.</p>
+    </div>
+
+
+    <h3>Activity Instructions</h3>
+    <p>For this activity, you will enhance your application by adding new functionality related to organizations. Specifically, you will create a new organization details page to display information about a specific organization and the service projects associated with it. This will use route parameters to identify organizations by their unique IDs.</p>
+
+    <h4>New Functionality</h4>
+    <p>You will add the following new functionality:</p>
+    <ul>
+      <li>Create a new organization details page that lists the details of a specific organization and the service projects associated with that organization. The URL for this page will be in the format <code>/organization/:id</code> such as <code>/organization/123</code>.</li>
+      <li>Update your main partner organizations page (<code>/organizations</code>) that lists all organizations so that it now includes links to the new organization details pages.</li>
+    </ul>
+
+
+    <p>To complete this activity, follow these steps:</p>
+    <h4 class="step">Create the model functions for organization details</h4>
+    <p>For the organization details page, you will need two model functions:</p>
+
+    <ol>
+      <li>A function to retrieve the details of a specific organization.</li>
+      <li>A function to retrieve the service projects associated with a specific organization.</li>
+    </ol>
+
+    <p>In your organization model file <code>src/models/organizations.js</code>, create a new function that retrieves the details of a specific organization. This function should accept an organization ID as a parameter and return the relevant data.</p>
+
+    <ol>
+      <li>Open the <code>src/models/organizations.js</code> file and add the following new function for retrieving organization details. It should come directly after the other function you already have that retrieves all organizations.</li>
+  
+<pre><code data-highlighted="yes" class="hljs language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">getOrganizationDetails</span> = <span class="hljs-keyword">async</span> (<span class="hljs-params">organizationId</span>) =&gt; {
+      <span class="hljs-keyword">const</span> query = <span class="hljs-string">`
+      SELECT
+        organization_id,
+        name,
+        description,
+        contact_email,
+        logo_filename
+      FROM organization
+      WHERE organization_id = $1;
+    `</span>;
+
+      <span class="hljs-keyword">const</span> queryParams = [organizationId];
+      <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> db.<span class="hljs-title function_">query</span>(query, queryParams);
+
+      <span class="hljs-comment">// Return the first row of the result set, or null if no rows are found</span>
+      <span class="hljs-keyword">return</span> result.<span class="hljs-property">rows</span>.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span> ? result.<span class="hljs-property">rows</span>[<span class="hljs-number">0</span>] : <span class="hljs-literal">null</span>;
+};
+</code></pre>
+      <li>Export the new function by adding it to the export statement at the bottom of the file as follows:</li>
+<pre><code data-highlighted="yes" class="hljs language-cpp"><span class="hljs-comment">// Export the model functions</span>
+<span class="hljs-keyword">export</span> { getAllOrganizations, getOrganizationDetails };</code></pre>
+    </ol>
+
+
+    <div class="callout error">
+      <h4>Important Security Note</h4>
+      <p>Notice that this function uses a parameterized query to safely include the organization ID in the SQL statement, which helps prevent SQL injection attacks. If you included the organization ID directly in the query string, it could allow malicious users to execute arbitrary SQL commands.</p>
+      <p>In this course, you should always use parameterized queries when including user input in SQL statements. Never put the user input directly into the query string.</p>
+    </div>
+
+    <p>Next, you will create the model function to retrieve the service projects associated with a specific organization. This function should be in the <code>src/models/projects.js</code> model file, because it relates specifically to projects.</p>
+
+    <ol>
+      <li>Open the <code>src/models/projects.js</code> file and add the following new function for retrieving service projects associated with an organization. It should come directly after the other function you already have that retrieves all projects.</li>
+<pre><code data-highlighted="yes" class="hljs language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">getProjectsByOrganizationId</span> = <span class="hljs-keyword">async</span> (<span class="hljs-params">organizationId</span>) =&gt; {
+      <span class="hljs-keyword">const</span> query = <span class="hljs-string">`
+        SELECT
+          project_id,
+          organization_id,
+          title,
+          description,
+          location,
+          date
+        FROM project
+        WHERE organization_id = $1
+        ORDER BY date;
+      `</span>;
+      
+      <span class="hljs-keyword">const</span> queryParams = [organizationId];
+      <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> db.<span class="hljs-title function_">query</span>(query, queryParams);
+
+      <span class="hljs-keyword">return</span> result.<span class="hljs-property">rows</span>;
+};</code></pre>
+      <li>Export the new function by adding it to the export statement at the bottom of the file as follows:</li>
+<pre><code data-highlighted="yes" class="hljs language-cpp"><span class="hljs-comment">// Export the model functions</span>
+<span class="hljs-keyword">export</span> { getAllProjects, getProjectsByOrganizationId };</code></pre>
+    </ol>
+
+
+    <h4 class="step">Create the controller function for organization details</h4>
+    <p>In your organization controller file <code>src/controllers/organizations.js</code>, create a new controller function that uses the model functions you just created to get the details of an organization and its service projects and then pass that data to a new view to render the information.</p>
+
+    <ol>
+      <li>Open the <code>src/controllers/organizations.js</code> file and import the two model functions at the top of the file (replace your earlier import statement that only imported <code>getAllOrganizations</code> to now import two functions from that model):</li>
+
+        <pre><code data-highlighted="yes" class="hljs language-javascript"><span class="hljs-keyword">import</span> { getAllOrganizations, getOrganizationDetails } <span class="hljs-keyword">from</span> <span class="hljs-string">'../models/organizations.js'</span>;
+<span class="hljs-keyword">import</span> { getProjectsByOrganizationId } <span class="hljs-keyword">from</span> <span class="hljs-string">'../models/projects.js'</span>;
+</code></pre>
+        
+        <li>Next, add the following new controller function for the organization details page. It should come directly after the other controller function you already have to render the list of all organizations. This controller function should call the two model functions you just imported to get the organization details and its associated service projects, then pass that data to a new view to render the information.</li>
+
+<pre><code data-highlighted="yes" class="hljs language-csharp"><span class="hljs-keyword">const</span> showOrganizationDetailsPage = <span class="hljs-keyword">async</span> (req, res) =&gt; {
+    <span class="hljs-keyword">const</span> organizationId = req.<span class="hljs-keyword">params</span>.id;
+    <span class="hljs-keyword">const</span> organizationDetails = <span class="hljs-keyword">await</span> getOrganizationDetails(organizationId);
+    <span class="hljs-keyword">const</span> projects = <span class="hljs-keyword">await</span> getProjectsByOrganizationId(organizationId);
+    <span class="hljs-keyword">const</span> title = <span class="hljs-string">'Organization Details'</span>;
+
+    res.render(<span class="hljs-string">'organization'</span>, {title, organizationDetails, projects});
+};</code></pre>
+
+      <li>Notice that this code refers to an EJS template named <code>organization.ejs</code> which does not exist yet. You will create this EJS template in a future step.</li>
+
+      <li>Export the new controller function by adding it to the export statement at the bottom of the file as follows:</li>
+<pre><code data-highlighted="yes" class="hljs language-cpp"><span class="hljs-comment">// Export any controller functions</span>
+<span class="hljs-keyword">export</span> { showOrganizationsPage, showOrganizationDetailsPage };</code></pre>
+
+    </ol>
+    <h4 class="step">Update the router to include the new route</h4>
+    <p>In your router file <code>src/routes.js</code>, add a new route that maps to the organization details controller function.</p>
+    <ol>
+      <li>Open the <code>src/routes.js</code> file. At the top, add the following import to the list of controller imports:</li>
+<pre><code data-highlighted="yes" class="hljs language-javascript"><span class="hljs-keyword">import</span> { showOrganizationDetailsPage } <span class="hljs-keyword">from</span> <span class="hljs-string">'./controllers/organizations.js'</span>;</code></pre>
+      
+      <li>Add the following new route definition. You can place this at the end of the list of the other routes.</li>
+<pre><code data-highlighted="yes" class="hljs language-csharp"><span class="hljs-comment">// Route for organization details page</span>
+router.<span class="hljs-keyword">get</span>(<span class="hljs-string">'/organization/:id'</span>, showOrganizationDetailsPage);</code></pre>
+    </ol>
+
+    <p>Notice that this route uses a URL parameter (<code>:id</code>) to capture the organization ID from the URL. This ID is then accessed by the controller function to fetch and display the details for the specific organization.</p>
+
+    <p>For example, the URL for this page will look like <code>/organization/13</code> where <code>13</code> is the ID of the organization.</p>
+
+    <h4 class="step">Create the organization details view</h4>
+    <p>Create a new view file <code>src/views/organization.ejs</code> to display the organization details and its associated service projects.</p>
+    <ol>
+      <li>Create a new file named <code>organization.ejs</code> in your <code>src/views</code> directory.</li>
+      
+      <li>This EJS template should include the following:
+
+        <ul>
+          <li>The header and footer partials.</li>
+          <li>An <code>&lt;h2&gt;</code> heading for the organization name.</li>
+          <li>An image of the organization's logo.</li>
+          <li>A paragraph with the organization's description.</li>
+          <li>A list of the service projects associated with the organization. Each service project should be a link to the service project details page. You have not created this page yet, but you will in the team activity this week. The URL for the links should be <code>/project/[id]</code> where <code>[id]</code> is the ID of the service project. (This link will not work yet, but as soon as you create the page in your team activity it will work.)</li>
+        </ul>
+
+      </li>
+
+      <details>
+        <summary>Sample code (click to expand)</summary>
+        <p>Your code for <code>src/views/organization.ejs</code> should look similar to the following:</p>
+        <pre><code class="html hljs language-xml" data-highlighted="yes">&lt;%- include('partials/header') %&gt;
+<span class="hljs-tag">&lt;<span class="hljs-name">main</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>&lt;%= title %&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>&lt;%= organizationDetails.name %&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/images/&lt;%= organizationDetails.logo_filename %&gt;"</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">"&lt;%= organizationDetails.name %&gt; logo"</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Description: &lt;%= organizationDetails.description %&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">h3</span>&gt;</span>Service Projects<span class="hljs-tag">&lt;/<span class="hljs-name">h3</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+        &lt;% projects.forEach(project =&gt; { %&gt;
+            <span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"/project/&lt;%= project.project_id %&gt;"</span>&gt;</span>&lt;%= project.title %&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+        &lt;% }) %&gt;
+    <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span>
+&lt;%- include('partials/footer') %&gt;
+</code></pre>
+
+      <p>Notice that the image URL will be built to have the logo filename from the organization details, so it will generate a URL like this <code>/images/logo.png</code> where <code>logo.png</code> is the filename of the organization's logo.</p>
+
+      </details>
+
+
+    </ol>
+
+
+    <h4 class="step">Update the organizations list view to include links</h4>
+    <p>Update the main partner organizations view <code>src/views/organizations.ejs</code> to include links to the new organization details pages.</p>
+    <ol>
+      <li>Open the <code>src/views/organizations.ejs</code> file.</li>
+      <li>Modify the code that displays each organization to include a link to the organization details page. The new link should look as follows:</li>
+<pre><code class="html hljs language-xml" data-highlighted="yes"><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"/organization/&lt;%= organization.organization_id %&gt;"</span>&gt;</span>&lt;%= organization.name %&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></code></pre>
+
+    </ol>
+
+    <p>Notice that the organization ID is placed in the link URL, so that it will generate a URL like this <code>/organization/13</code> where <code>13</code> is the ID of the organization.</p>
+
+    <details>
+      <summary>Sample code (click to expand)</summary>
+      <p>The complete <code>src/views/organizations.ejs</code> file should look similar to this:</p>
+      
+<pre><code class="html hljs language-xml" data-highlighted="yes">&lt;%- include('partials/header') %&gt;
+<span class="hljs-tag">&lt;<span class="hljs-name">main</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>&lt;%= title %&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Here are a few of our partner organizations:<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+        &lt;% organizations.forEach(organization =&gt; { %&gt;
+            <span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/images/&lt;%= organization.logo_filename %&gt;"</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">"&lt;%= organization.name %&gt; logo"</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"/organization/&lt;%= organization.organization_id %&gt;"</span>&gt;</span>&lt;%= organization.name %&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>: &lt;%= organization.contact_email %&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+        &lt;% }); %&gt;
+    <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span>
+
+&lt;%- include('partials/footer') %&gt;
+</code></pre>
+    </details>
+
+    <h4 class="step">Test your application</h4>
+    <p>Start your application and navigate to the organizations list page. Click on an organization link to verify that the organization details page displays the correct information.</p>
+
+    <div class="callout info">
+      <h4>Hint: View the HTML source</h4>
+    
+      <p>If you encounter any issues with the links or images not displaying correctly, viewing the HTML source can help you diagnose the problem. In the browser, right-click on the page and select <strong>View Page Source</strong> (or a similar option depending on your browser). This will show you the raw HTML that was generated by your EJS templates.</p>
+    </div>
+
+    <h4 class="step">Deploy your updated application</h4>
+    <p>Once you have verified that everything is working correctly locally, deploy your updated application to your hosting environment, and test it there.</p>
+
+    <h3>Submission</h3>
+    <p>You have now completed all the required steps for this week's learning activities.</p>
+    <p>Return to Canvas to take the associated quiz there.</p>
+
+    <p>Other Links:</p>
+    <ul>
+      <li>Return to: <a href="https://byui-cse.github.io/cse340-ww-course-v2/week03/index.html">Week Overview</a> | <a href="https://byui-cse.github.io/cse340-ww-course-v2/index.html">Course Home</a></li>
+    </ul>
+  </main>
+
+  <footer>
+    <p>Copyright © Brigham Young University-Idaho | All rights reserved</p>
+  </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+
+
+
+</body></html>
