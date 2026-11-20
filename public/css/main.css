@@ -98,6 +98,29 @@ li {
     margin-bottom: 0.5rem;
 }
 
+.category-tags {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-left: 0.25rem;
+}
+
+.category-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    background: #dcefee;
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.category-tag:hover,
+.category-tag:focus {
+    background: #c5e3df;
+    text-decoration: underline;
+}
+
 footer {
     text-align: center;
     padding: 1.5rem 1rem 2rem;

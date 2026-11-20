@@ -111,3 +111,12 @@ VALUES
 (13, 2), -- School Supply Packing -> Education
 (14, 3), -- Winter Coat Drive -> Community Support
 (15, 3); -- Blood Drive Coordination -> Community Support
+
+-- ========================================
+-- Update 5 projects to upcoming dates
+-- ========================================
+UPDATE project SET date = '2026-11-25' WHERE project_id = 1;
+UPDATE project SET date = '2026-12-02' WHERE project_id = 2;
+UPDATE project SET date = '2026-12-10' WHERE project_id = 3;
+UPDATE project SET date = '2026-12-18' WHERE project_id = 4;
+UPDATE project SET date = '2027-01-05' WHERE project_id = 5;
