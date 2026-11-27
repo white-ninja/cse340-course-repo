@@ -238,6 +238,24 @@ li {
     text-decoration: underline;
 }
 
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+th,
+td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #dbe6ec;
+    text-align: left;
+}
+
+th {
+    background: #eef4f7;
+    color: var(--primary);
+}
+
 /* Flash message styles */
 .alert {
     max-width: 1100px;
